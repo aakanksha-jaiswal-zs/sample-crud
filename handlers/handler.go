@@ -3,33 +3,33 @@ package handlers
 import (
 	"github.com/zopsmart/gofr/pkg/gofr"
 	"github.com/zopsmart/sample-crud/models"
-	"github.com/zopsmart/sample-crud/stores"
+	"github.com/zopsmart/sample-crud/services"
 )
 
 type student struct {
-	store stores.Student
+	service services.Student
 }
 
-func New(store stores.Student) student {
-	return student{store: store}
+func New(store services.Student) *student {
+	return &student{service: store}
 }
 
-func (s student) Find(c *gofr.Context) (interface{}, error) {
+func (s *student) Find(c *gofr.Context) (interface{}, error) {
 	id := c.PathParam("id")
-	return s.store.Find(id)
+	return s.service.Find(c, id)
 }
 
-func (s student) Create(c *gofr.Context) (interface{}, error) {
+func (s *student) Create(c *gofr.Context) (interface{}, error) {
 	var student models.Student
 
 	if err := c.Bind(&student); err != nil {
 		return nil, err
 	}
 
-	return nil, s.store.Create(student)
+	return nil, s.service.Create(c, &student)
 }
 
-func (s student) Update(c *gofr.Context) (interface{}, error) {
+func (s *student) Update(c *gofr.Context) (interface{}, error) {
 	id := c.PathParam("id")
 
 	var student models.Student
@@ -38,11 +38,11 @@ func (s student) Update(c *gofr.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	return nil, s.store.Update(id, student)
+	return nil, s.service.Update(c, id, &student)
 }
 
-func (s student) Delete(c *gofr.Context) (interface{}, error) {
+func (s *student) Delete(c *gofr.Context) (interface{}, error) {
 	id := c.PathParam("id")
 
-	return nil, s.store.Delete(id)
+	return nil, s.service.Delete(c, id)
 }

@@ -2,58 +2,76 @@ package stores
 
 import (
 	"github.com/zopsmart/gofr/pkg/errors"
-	"github.com/zopsmart/sample-crud/db"
+	"github.com/zopsmart/gofr/pkg/gofr"
 	"github.com/zopsmart/sample-crud/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type student struct {
-	db []models.Student
 }
 
-func New() student {
-	return student{db: db.Students}
+func New() *student {
+	return &student{}
 }
 
-func (s student) Find(id string) (models.Student, error) {
-	for _, student := range s.db {
-		if student.ID == id {
-			return student, nil
-		}
+func (s *student) Find(c *gofr.Context, id string) (*models.Student, error) {
+	collection := c.MongoDB.Collection("students")
+
+	res := collection.FindOne(c.Context, bson.D{primitive.E{Key: "id", Value: id}})
+	if err := res.Err(); err != nil {
+		return nil, err
 	}
 
-	return models.Student{}, errors.EntityNotFound{Entity: "student", ID: id}
-}
+	var student models.Student
 
-func (s student) Create(student models.Student) error {
-	_, err := s.Find(student.ID)
-	if err == nil {
-		return errors.EntityAlreadyExists{}
-	}
-	s.db = append(s.db, student)
-
-	return nil
-}
-
-func (s student) Update(id string, student models.Student) error {
-	for i := range s.db {
-		if s.db[i].ID == id {
-			s.db[i].GPA = student.GPA
-			s.db[i].Name = student.Name
-			s.db[i].Email = student.Email
-			return nil
-		}
+	err := res.Decode(&student)
+	if err != nil {
+		return nil, err
 	}
 
-	return errors.EntityNotFound{Entity: "student", ID: id}
+	return &student, nil
 }
 
-func (s student) Delete(id string) error {
-	for i, student := range s.db {
-		if student.ID == id {
-			s.db = append(s.db[:i], s.db[i+1:]...)
-			return nil
-		}
+func (s *student) Create(c *gofr.Context, student *models.Student) error {
+	collection := c.MongoDB.Collection("students")
+
+	_, err := collection.InsertOne(c.Context, student)
+
+	return err
+}
+
+func (s *student) Update(c *gofr.Context, id string, student *models.Student) error {
+	collection := c.MongoDB.Collection("students")
+
+	res := collection.FindOneAndUpdate(c.Context, bson.D{primitive.E{Key: "id", Value: id}}, getUpdate(student))
+	if res == nil {
+		return errors.DB{} //todo remove
 	}
 
-	return errors.EntityNotFound{Entity: "student", ID: id}
+	return res.Err()
+}
+
+func getUpdate(student *models.Student) bson.M {
+	update := bson.M{}
+	if student.Name != "" {
+		update["name"] = student.Name
+	}
+
+	if student.GPA != 0 {
+		update["gpa"] = student.GPA
+	}
+
+	if student.Email != "" {
+		update["email"] = student.Email
+	}
+
+	return bson.M{"$set": update}
+}
+
+func (s *student) Delete(c *gofr.Context, id string) error {
+	collection := c.MongoDB.Collection("students")
+
+	_, err := collection.DeleteOne(c.Context, bson.D{primitive.E{Key: "id", Value: id}})
+	return err
 }

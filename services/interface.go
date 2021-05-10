@@ -1,4 +1,4 @@
-package stores
+package services
 
 import (
 	"github.com/zopsmart/gofr/pkg/gofr"

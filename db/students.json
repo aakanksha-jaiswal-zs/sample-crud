@@ -1,0 +1,7 @@
+[
+  {"id": "1", "name": "Student1", "email": "student1@gmail.com", "gpa": 8.1},
+  {"id": "2", "name": "Student2", "email": "student3@gmail.com", "gpa": 8.2},
+  {"id": "3", "name": "Student3", "email": "student3@gmail.com", "gpa": 8.3},
+  {"id": "4", "name": "Student4", "email": "student4@gmail.com", "gpa": 8.4},
+  {"id": "5", "name": "Student5", "email": "student5@gmail.com", "gpa": 8.5}
+]

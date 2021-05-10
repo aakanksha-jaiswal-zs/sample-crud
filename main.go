@@ -3,12 +3,14 @@ package main
 import (
 	"github.com/zopsmart/gofr/pkg/gofr"
 	"github.com/zopsmart/sample-crud/handlers"
+	"github.com/zopsmart/sample-crud/services"
 	"github.com/zopsmart/sample-crud/stores"
 )
 
 func main() {
 	store := stores.New()
-	handler := handlers.New(store)
+	service := services.New(store)
+	handler := handlers.New(service)
 
 	k := gofr.New()
 
