@@ -1,4 +1,4 @@
-package handlers
+package student
 
 import (
 	"github.com/zopsmart/gofr/pkg/gofr"

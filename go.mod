@@ -5,5 +5,4 @@ go 1.16
 require (
 	github.com/stretchr/testify v1.7.0
 	github.com/zopsmart/gofr v0.0.0-20210226065808-2aa48fe97a39
-	go.mongodb.org/mongo-driver v1.3.2
 )

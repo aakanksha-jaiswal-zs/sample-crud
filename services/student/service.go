@@ -1,6 +1,8 @@
-package services
+package student
 
 import (
+	"reflect"
+
 	"github.com/zopsmart/gofr/pkg/errors"
 	"github.com/zopsmart/gofr/pkg/gofr"
 	"github.com/zopsmart/sample-crud/models"
@@ -22,6 +24,10 @@ func (s *student) Find(c *gofr.Context, id string) (*models.Student, error) {
 
 	student, err := s.store.Find(c, id)
 	if err != nil {
+		return nil, err
+	}
+
+	if reflect.DeepEqual(student, &models.Student{}) {
 		return nil, errors.EntityNotFound{Entity: "student", ID: id}
 	}
 
@@ -29,7 +35,7 @@ func (s *student) Find(c *gofr.Context, id string) (*models.Student, error) {
 }
 
 func (s *student) Create(c *gofr.Context, student *models.Student) error {
-	_, err := s.store.Find(c, student.ID)
+	_, err := s.Find(c, student.ID)
 	if err == nil {
 		return errors.EntityAlreadyExists{}
 	}
@@ -42,7 +48,7 @@ func (s *student) Update(c *gofr.Context, id string, student *models.Student) er
 		return errors.MissingParam{Param: []string{"id"}}
 	}
 
-	_, err := s.store.Find(c, id)
+	_, err := s.Find(c, id)
 	if err != nil {
 		return errors.EntityNotFound{Entity: "student", ID: id}
 	}
@@ -55,7 +61,7 @@ func (s *student) Delete(c *gofr.Context, id string) error {
 		return errors.MissingParam{Param: []string{"id"}}
 	}
 
-	_, err := s.store.Find(c, id)
+	_, err := s.Find(c, id)
 	if err != nil {
 		return errors.EntityNotFound{Entity: "student", ID: id}
 	}

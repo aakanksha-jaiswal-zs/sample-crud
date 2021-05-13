@@ -1,4 +1,4 @@
-package stores
+package student
 
 import (
 	"os"
@@ -8,7 +8,6 @@ import (
 	"github.com/zopsmart/gofr/pkg/datastore"
 	"github.com/zopsmart/gofr/pkg/gofr"
 	"github.com/zopsmart/sample-crud/models"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func initializeTest(t *testing.T) *gofr.Gofr {
@@ -17,8 +16,8 @@ func initializeTest(t *testing.T) *gofr.Gofr {
 	k := gofr.New()
 
 	//initializing the seeder
-	seeder := datastore.NewSeeder(&k.DataStore, "../db")
-	seeder.RefreshMongoCollections(t, "students")
+	seeder := datastore.NewSeeder(&k.DataStore, "../../db")
+	seeder.RefreshCassandra(t, "students")
 
 	return k
 }
@@ -30,8 +29,7 @@ func TestStore_Find(t *testing.T) {
 		output      *models.Student
 		err         error
 	}{
-		{description: "Success Case: Find Student with ID 1", input: "1", output: &models.Student{ID: "1", Name: "Student1", Email: "student1@gmail.com", GPA: 8.1}},
-		{description: "Failure case: No Student with ID 100", input: "100", output: nil, err: mongo.ErrNoDocuments},
+		{description: "Success Case: Find Student with ID 1", input: "1", output: &models.Student{ID: "1", Name: "Student1", Email: "student1@gmail.com", GPA: 8}},
 	}
 
 	store := New()
@@ -52,7 +50,7 @@ func TestStore_Create(t *testing.T) {
 		description string
 		input       *models.Student
 	}{
-		{description: "Successful Insertion", input: &models.Student{ID: "6", Name: "Student6", Email: "student6@gmail.com", GPA: 8.6}},
+		{description: "Successful Insertion", input: &models.Student{ID: "6", Name: "Student6", Email: "student6@gmail.com", GPA: 8}},
 	}
 
 	store := New()
@@ -73,8 +71,7 @@ func TestStore_Update(t *testing.T) {
 		input       *models.Student
 		err         error
 	}{
-		{description: "Success Case: Update Student with ID 1", id: "1", input: &models.Student{Name: "Student1", Email: "newemail@gmail.com", GPA: 8.1}},
-		{description: "Failure case: No Student with ID 100", id: "100", input: &models.Student{Name: "Student1", Email: "newemail@gmail.com", GPA: 8.1}, err: mongo.ErrNoDocuments},
+		{description: "Success Case: Update Student with ID 1", id: "1", input: &models.Student{Name: "Student1", Email: "newemail@gmail.com", GPA: 8}},
 	}
 
 	store := New()
